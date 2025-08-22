@@ -1,4 +1,6 @@
-﻿# Note this script is designed for a single domain environment
+﻿# PowerShell script authored by Sean Metcalf (@PyroTek3)
+# 2025-08-22
+# Script provided as-is
 
 [array]$ADAdminArray = Get-ADGroupMember -Identity 'Administrators' -Recursive 
 
