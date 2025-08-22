@@ -1,5 +1,5 @@
 ﻿# PowerShell script authored by Sean Metcalf (@PyroTek3)
-# 2025-08-22
+# 2025-08-12
 # Script provided as-is
 
 $LastLoggedOnDate = $(Get-Date) - $(New-TimeSpan -days 180)  
