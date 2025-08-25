@@ -2,8 +2,8 @@
 # 2025-08-25
 # Script provided as-is
 
-$GroupArray = @('Account Operators','Backup Operators','Cert Publishers','DNSAdmins','Enterprise Key Admins','Event Log Readers','IIS_IUSRS',`
- 'Print Operators','Server Operators','Schema Admins')
+$GroupArray = @('Account Operators','Backup Operators','Cert Publishers','DNSAdmins','Enterprise Key Admins','Event Log Readers',`
+'Group Policy Creator Owners','Print Operators','Server Operators','Schema Admins')
 
 $PrivilegedGroupMemberArray = @()
 ForEach ($GroupArrayItem in $GroupArray)
@@ -22,6 +22,7 @@ ForEach ($GroupArrayItem in $GroupArray)
        SWITCH ($GroupArrayItem)
         {
             'Account Operators' { Write-Warning "The $GroupArrayItem group should be empty, but contains $($ADGroupMemberArray.Count) members" }
+            'Group Policy Creator Owners' { Write-Warning "The $GroupArrayItem group should be empty, but contains $($ADGroupMemberArray.Count) members" }
             'Print Operators' { Write-Warning "The $GroupArrayItem group should be empty, but contains $($ADGroupMemberArray.Count) members" }
             'Schema Admins' { Write-Warning "The $GroupArrayItem group should be empty, but contains $($ADGroupMemberArray.Count) members" }
         }
@@ -30,12 +31,9 @@ ForEach ($GroupArrayItem in $GroupArray)
     IF ( ($GroupArrayItem -eq 'Backup Operators') -AND ($ADGroupMemberArray.Count -ge 5) )
      { Write-Warning "The $GroupArrayItem group should typically have less than ~5 members, but contains $($ADGroupMemberArray.Count) members" }
     IF ( ($GroupArrayItem -eq 'Cert Publishers') -AND ($ADGroupMemberArray.Count -ge 5) )
-     { Write-Warning "The $GroupArrayItem group should typically have less than ~5 members, but contains $($ADGroupMemberArray.Count) members" }
+     { Write-Warning "The $GroupArrayItem group should typically have ~5 members, but contains $($ADGroupMemberArray.Count) members" }
     IF ( ($GroupArrayItem -eq 'Event Log Readers') -AND ($ADGroupMemberArray.Count -ge 2) )
      { Write-Warning "The $GroupArrayItem group should typically have less than ~3 members, but contains $($ADGroupMemberArray.Count) members" }
-    IF ( ($GroupArrayItem -eq 'IIS_IUSRS') -AND ($ADGroupMemberArray.Count -ge 2) )
-     { Write-Warning "The $GroupArrayItem group should typically have ~1 member, but contains $($ADGroupMemberArray.Count) members" }
  }
 
-$PrivilegedGroupMemberArray | Select GroupName,MemberCount,Members | Format-Table -Auto
-
+$PrivilegedGroupMemberArray | Sort SamAccountName | Select GroupName,MemberCount,Members | Format-Table -Auto
