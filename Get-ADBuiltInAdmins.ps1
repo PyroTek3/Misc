@@ -2,8 +2,7 @@
 # 2025-08-25
 # Script provided as-is
 
-$GroupArray = @('Account Operators','Backup Operators','Cert Publishers','DNSAdmins','Enterprise Key Admins','Event Log Readers',`
-'Group Policy Creator Owners','Print Operators','Server Operators','Schema Admins')
+$GroupArray = @('Account Operators','Backup Operators','Cert Publishers','DNSAdmins','Enterprise Key Admins','Event Log Readers','Group Policy Creator Owners','Print Operators','Server Operators','Schema Admins')
 
 $PrivilegedGroupMemberArray = @()
 ForEach ($GroupArrayItem in $GroupArray)
