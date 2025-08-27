@@ -1,0 +1,1 @@
+﻿Get-ADUser "$((Get-ADDomain).DomainSID)-500" -Properties Name,Enabled,Created,PasswordLastSet,LastLogonDate,ServicePrincipalName,SID
