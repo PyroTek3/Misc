@@ -2,6 +2,7 @@
 # 2025-09-03
 # Script provided as-is
 
+Write-Host "Getting domains in the AD Forest & Discovering forest Domain Controllers"
 $ForestDCArray = @()
 ForEach ($ForestDomainItem in $((Get-ADForest).Domains) )
  {
@@ -11,12 +12,15 @@ ForEach ($ForestDomainItem in $((Get-ADForest).Domains) )
     { [array]$ForestDCArray += Get-ADDomainController $DomainControllerItem -Server $DomainDC }
  }
 
+Write-Host "Scanning for DCs running Windows Server 2025..."
 $Forest2025DCArray = $ForestDCArray | Where {$_.OperatingSystem -like "*2025*"}
 Write-Host "The following DCs are running Windows Server 2025:"
 $Forest2025DCArray | Select Domain,Name,OperatingSystem,Site | format-table -AutoSize
 
+Write-Host "Checking for installed KDS Root Keys (note this may not work if the script is not opened with admin rights)..."
 $KDSRootKeyArray = Get-KdsRootKey 
 
+Write-Host "Parsing KDS Root key data..."
 IF ($KDSRootKeyArray)
  {
     $KDSRootKeyDomainArray = @()
