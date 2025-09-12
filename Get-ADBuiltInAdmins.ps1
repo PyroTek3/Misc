@@ -2,12 +2,20 @@
 # 2025-08-25
 # Script provided as-is
 
-$GroupArray = @('Account Operators','Backup Operators','Cert Publishers','DNSAdmins','Enterprise Key Admins','Event Log Readers','Group Policy Creator Owners','Print Operators','Server Operators','Schema Admins')
+Param
+ (
+    $Domain = $env:userdnsdomain
+ )
+
+$DomainDC = (Get-ADDomainController -Discover -DomainName $Domain).Name
+$DomainInfo = Get-ADDomain -Server $DomainDC
+
+$GroupArray = @('Account Operators','Backup Operators','DNSAdmins','Enterprise Key Admins','Event Log Readers','Group Policy Creator Owners','Print Operators','Server Operators','Schema Admins')
 
 $PrivilegedGroupMemberArray = @()
 ForEach ($GroupArrayItem in $GroupArray)
  {
-    $ADGroupMemberArray = Get-ADGroupMember $GroupArrayItem -Recursive
+    $ADGroupMemberArray = Get-ADGroupMember $GroupArrayItem -Recursive -Server $DomainDC
     $ADGroupMemberString = $ADGroupMemberArray.name -join ","
     $PrivilegedGroupMemberItem = New-Object PSObject
     $PrivilegedGroupMemberItem | Add-Member -MemberType NoteProperty -Name GroupName -Value $GroupArrayItem -Force
