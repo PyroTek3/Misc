@@ -1,6 +1,13 @@
 ﻿# PowerShell script authored by Sean Metcalf (@PyroTek3)
-# 2025-08-12
+# 2025-09-12
 # Script provided as-is
+Param
+ (
+    $Domain = $env:userdnsdomain
+ )
+
+$DomainDC = (Get-ADDomainController -Discover -DomainName $Domain).Name
+$DomainInfo = Get-ADDomain -Server $DomainDC
 
 $LastLoggedOnDate = $(Get-Date) - $(New-TimeSpan -days 180)  
 $PasswordStaleDate = $(Get-Date) - $(New-TimeSpan -days 180)
@@ -10,7 +17,7 @@ $ADLimitedProperties = @("Name","Enabled","SAMAccountname","DisplayName","Enable
         "AdminCount","Created","Modified","LastBadPasswordAttempt","badpwdcount","mail","CanonicalName","DistinguishedName",
         "ServicePrincipalName","SIDHistory","PrimaryGroupID","UserAccountControl","DoesNotRequirePreAuth")
 
-[array]$DomainUsers = Get-ADUser -Filter * -Property $ADLimitedProperties
+[array]$DomainUsers = Get-ADUser -Filter * -Property $ADLimitedProperties -Server $DomainDC
 [array]$DomainEnabledUsers = $DomainUsers | Where {$_.Enabled -eq $True }
 [array]$DomainEnabledInactiveUsers = $DomainEnabledUsers | Where { ($_.LastLogonDate -le $LastLoggedOnDate) -AND ($_.PasswordLastSet -le $PasswordStaleDate) }
 [array]$DomainUsersWithReversibleEncryptionPasswordArray = $DomainUsers | Where { $_.UserAccountControl -band 0x0080 } 
@@ -30,6 +37,3 @@ Write-Host "Enabled Users With Kerberos DES: $($DomainKerberosDESUsersArray.Coun
 Write-Host "Enabled Users That Do Not Require Kerberos Pre-Authentication: $($DomainUserDoesNotRequirePreAuthArray.Count)"
 Write-Host "Enabled Users With SID History: $($DomainUsersWithSIDHistoryArray.Count)"
 Write-Host "`nReview & clean up as appropriate"
-
-$AboutMe = '| Sean Metcalf | @PyroTek3 |'
-$AboutMe
