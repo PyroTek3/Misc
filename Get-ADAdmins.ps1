@@ -2,16 +2,24 @@
 # 2025-09-03
 # Script provided as-is
 
-[array]$ADAdminArray = Get-ADGroupMember -Identity 'Administrators' -Recursive 
+Param
+ (
+    $Domain = $env:userdnsdomain
+ )
+
+$DomainDC = (Get-ADDomainController -Discover -DomainName $Domain).Name
+$DomainInfo = Get-ADDomain -Server $DomainDC
+
+[array]$ADAdminArray = Get-ADGroupMember -Identity 'Administrators' -Recursive -Server $DomainDC
 
 $ADAdminPropertyArray = @()
 ForEach($ADAdminArrayItem in $ADAdminArray)
  { 
     SWITCH ($ADAdminArrayItem.objectClass)
     {
-        'User' { [array]$ADAdminPropertyArray += Get-ADUser $ADAdminArrayItem.DistinguishedName -Prop * }
-        'Computer' { [array]$ADAdminPropertyArray += Get-ADComputer $ADAdminArrayItem.DistinguishedName -Prop *  }
-        'msDS-GroupManagedServiceAccount' { [array]$ADAdminPropertyArray += Get-ADServiceAccount $ADAdminArrayItem.DistinguishedName -Prop *  }
+        'User' { [array]$ADAdminPropertyArray += Get-ADUser $ADAdminArrayItem.DistinguishedName -Prop *  -Server $DomainDC }
+        'Computer' { [array]$ADAdminPropertyArray += Get-ADComputer $ADAdminArrayItem.DistinguishedName -Prop *   -Server $DomainDC }
+        'msDS-GroupManagedServiceAccount' { [array]$ADAdminPropertyArray += Get-ADServiceAccount $ADAdminArrayItem.DistinguishedName -Prop *   -Server $DomainDC }
     }
  }
 
